@@ -249,6 +249,13 @@
     <div id="screen-loading" class="screen active">
       <div class="mini-loader"></div>
       <p style="color:var(--muted);font-size:.83rem;margin-top:.5rem">Verifying your activation link…</p>
+      <div id="debug-console" style="margin-top:1.5rem;padding:1rem;background:#1e293b;border-radius:8px;font-family:monospace;font-size:.7rem;color:#10b981;text-align:left;max-height:300px;overflow-y:auto;display:none">
+        <div style="color:#60a5fa;margin-bottom:.5rem;font-weight:600">Debug Console:</div>
+        <div id="debug-log"></div>
+      </div>
+      <button onclick="document.getElementById('debug-console').style.display='block'" style="margin-top:1rem;padding:.5rem 1rem;background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:6px;cursor:pointer;font-size:.75rem">
+        Show Debug Info
+      </button>
     </div>
 
     <!-- Invalid -->
@@ -574,6 +581,25 @@
     postApprovedText:'', postApprovedSteps:[]
   };
 
+  // ── Debug logging helper ─────────────────────────────────────────────────
+  const debugLog = (msg, isError = false) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logMsg = `[${timestamp}] ${msg}`;
+    
+    if (isError) {
+      console.error(logMsg);
+    } else {
+      console.log(logMsg);
+    }
+    
+    const debugLogEl = document.getElementById('debug-log');
+    if (debugLogEl) {
+      const color = isError ? '#ef4444' : '#10b981';
+      debugLogEl.innerHTML += `<div style="color:${color};margin-bottom:.3rem">${logMsg}</div>`;
+      debugLogEl.scrollTop = debugLogEl.scrollHeight;
+    }
+  };
+
   // ── Notification banner ──────────────────────────────────────────────────
   const showNotification = (notif) => {
     if (!notif || !notif.message) return;
@@ -660,39 +686,77 @@
 
   // ── Fetch & boot ─────────────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', async () => {
-    if (!linkToken) { showInvalid('No activation link found.'); return; }
+    debugLog('=== ACTIVATION PAGE STARTED ===');
+    debugLog(`URL: ${window.location.href}`);
+    debugLog(`Token from URL: ${linkToken || 'NOT FOUND'}`);
+    
+    // Update loading text with token info
+    const loadingText = document.querySelector('#screen-loading p');
+    if (loadingText) {
+      loadingText.innerHTML = `Verifying your activation link…<br><small style="font-size:.7rem;margin-top:.5rem;display:block;opacity:.7">Token: ${linkToken ? linkToken.substring(0,8)+'...' : 'NOT FOUND'}</small>`;
+    }
+    
+    if (!linkToken) { 
+      debugLog('ERROR: No token found in URL', true);
+      showInvalid('No activation link found.', 'No token parameter in URL'); 
+      return; 
+    }
     
     try {
+      debugLog('Starting fetch to /api/validate-token...');
+      
       // Add timeout to prevent hanging
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      const timeoutId = setTimeout(() => {
+        debugLog('ERROR: Fetch timeout after 15 seconds', true);
+        controller.abort();
+      }, 15000);
       
-      const r = await fetch(`/api/validate-token?token=${linkToken}`, {
+      const fetchUrl = `/api/validate-token?token=${linkToken}`;
+      debugLog(`Fetching: ${fetchUrl}`);
+      
+      const r = await fetch(fetchUrl, {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
       
+      debugLog(`Response status: ${r.status}`);
+      debugLog(`Response ok: ${r.ok}`);
+      
       if (!r.ok) {
+        debugLog(`ERROR: HTTP ${r.status}`, true);
         if (r.status === 404) {
-          showInvalid('This activation link is invalid. Please contact support.');
+          showInvalid('This activation link is invalid. Please contact support.', `HTTP 404 - Token: ${linkToken}`);
           return;
         }
         if (r.status === 410) {
           const errData = await r.json().catch(() => ({}));
-          showInvalid(errData.error || 'This link is no longer valid. Please contact support.');
+          debugLog(`Link deactivated/expired: ${JSON.stringify(errData)}`, true);
+          showInvalid(errData.error || 'This link is no longer valid. Please contact support.', `HTTP 410 - ${JSON.stringify(errData)}`);
           return;
         }
         throw new Error(`HTTP ${r.status}`);
       }
       
       const d = await r.json();
+      debugLog(`Response received, valid: ${d.valid}, submitted: ${d.submitted}, approved: ${d.approved}`);
 
       // Show notification if set
       if (d.notification) showNotification(d.notification);
 
-      if (!d.valid) { showInvalid(d.error); return; }
-      if (d.declined) { showDeclined(d.declineReason); return; }
+      if (!d.valid) { 
+        debugLog(`ERROR: Token validation failed - ${d.error}`, true);
+        showInvalid(d.error, `valid=false: ${d.error}`); 
+        return; 
+      }
+      if (d.declined) { 
+        debugLog(`Request declined: ${d.declineReason}`);
+        showDeclined(d.declineReason); 
+        return; 
+      }
 
+      debugLog('Token valid, setting up state...');
+      
       state.customerName        = d.customerName;
       state.packageType         = d.packageType;
       state.product             = d.product || 'claude';
@@ -707,16 +771,25 @@
       state.accessLink          = d.accessLink   || '';
 
       const isGpt = state.product === 'chatgpt';
+      debugLog(`Product: ${state.product}, isGpt: ${isGpt}`);
       setGptMode(isGpt, state.credentialsMode);
 
       if (d.submitted) {
+        debugLog('Form already submitted');
         state.orgId       = d.orgId;
         state.sessionData = d.sessionData;
         state.wechat      = d.wechat;
         state.email       = d.email;
-        if (d.approved) showActivated(d.approvedAt, d.subscriptionExpiresAt);
-        else { showProcessing(); startPolling(); }
+        if (d.approved) {
+          debugLog('Showing activated screen');
+          showActivated(d.approvedAt, d.subscriptionExpiresAt);
+        } else { 
+          debugLog('Showing processing screen');
+          showProcessing(); 
+          startPolling(); 
+        }
       } else {
+        debugLog('Showing form for new submission');
         document.getElementById('cust-name').textContent = d.customerName;
         document.getElementById('pkg-label').textContent = d.packageType;
 
@@ -731,14 +804,18 @@
         }
         // Org ID / session data are always required fresh — never pre-fill
         checkReady();
+        debugLog('Calling show("screen-form")');
         show('screen-form');
+        debugLog('Form screen should now be visible');
       }
     } catch (err) { 
-      console.error('Validation error:', err);
+      debugLog(`EXCEPTION: ${err.name} - ${err.message}`, true);
+      debugLog(`Stack: ${err.stack}`, true);
+      
       if (err.name === 'AbortError') {
         showInvalid('Request timed out. Please check your connection and try again.', 'Fetch timeout after 15 seconds');
       } else {
-        showInvalid('Unable to verify your link. Please refresh the page or contact support.', err.message || err.toString());
+        showInvalid('Unable to verify your link. Please refresh the page or contact support.', `${err.name}: ${err.message}`);
       }
     }
   });
