@@ -275,7 +275,7 @@
       <div class="state-title">Request Declined</div>
       <p class="state-sub">Your activation request could not be processed.</p>
       <div class="decline-banner">
-        <div class="decline-banner-title">⚠ Declined by DTC System</div>
+        <div class="decline-banner-title">⚠ Declined by the Server</div>
         <div class="decline-banner-msg" id="decline-reason-msg">Please contact support.</div>
       </div>
     </div>
@@ -368,7 +368,7 @@
 
       <div class="divider"></div>
       <button class="btn-submit" id="submit-btn" disabled onclick="handleSubmit()">
-        <span class="btn-text">Submit Details →</span>
+        <span class="btn-text">Activate Now →</span>
         <div class="spinner"></div>
       </button>
     </div>
@@ -380,7 +380,7 @@
         <div class="orbit-center" id="proc-icon">⚡</div>
       </div>
       <div class="state-title" id="proc-title">Processing Your Order</div>
-      <p class="state-sub" id="proc-msg">Your details have been received and are being processed.</p>
+      <p class="state-sub" id="proc-msg">Your order is being processed</p>
       
       <!-- Progress indicator -->
       <div class="pulse-bars" id="pulse-bars">
@@ -399,8 +399,8 @@
         <div class="tl-item" id="tl-stage1">
           <div class="tl-dot done">✓</div>
           <div class="tl-body">
-            <div class="tl-title">Details Submitted</div>
-            <div class="tl-sub">Your information has been received successfully.</div>
+            <div class="tl-title">Processing</div>
+            <div class="tl-sub">Your order has been received and is being processed.</div>
           </div>
         </div>
         
@@ -883,7 +883,7 @@
       document.getElementById('tl2-title').textContent = 'Processing';
       document.getElementById('tl2-sub').textContent = 'Validating your details and preparing your account...';
       document.getElementById('proc-status-pill').innerHTML = '<span class="pd"></span>Processing';
-      document.getElementById('proc-title').textContent = 'Processing Your Order';
+      document.getElementById('proc-title').textContent = 'Your order is being processed';
       
       document.getElementById('tl3-dot').className = 'tl-dot wait';
       document.getElementById('tl3-title').classList.add('dim');
