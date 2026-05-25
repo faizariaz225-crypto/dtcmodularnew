@@ -13,6 +13,7 @@ const Payments = (() => {
   const load = async () => {
     const d = await api('/admin/payments', null, 'GET');
     _payments = (d || []).slice().reverse(); // newest first
+    Store.setPayments(_payments);
     render();
   };
 
@@ -110,6 +111,10 @@ const Payments = (() => {
     document.getElementById('refund-modal').classList.remove('open');
     await load();
     Dashboard.reload();
+    // Also reload customers view if it's active
+    if (document.getElementById('page-customers').classList.contains('active')) {
+      Customers.reload();
+    }
   };
 
   return { load, setFilter, render, openRefund, confirmRefund };

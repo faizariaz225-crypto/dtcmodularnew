@@ -172,8 +172,7 @@ const Dashboard = (() => {
     } else {
       fields.innerHTML = rows.map(r => `
         <label style="display:flex;align-items:flex-start;gap:.55rem;cursor:pointer;padding:.4rem .5rem;border-radius:7px;border:1px solid var(--warn-border);background:rgba(255,255,255,.55)">
-          <input type="checkbox" name="carry-over" data-key="${r.key}" data-value="${encodeURIComponent(r.value)}"
-            style="width:15px;height:15px;margin-top:1px;cursor:pointer;flex-shrink:0;accent-color:var(--blue)" checked/>
+          <input type="checkbox" name="carry-over" data-key="${r.key}" data-value="${encodeURIComponent(r.value)}" checked/>
           <span style="font-size:.78rem;line-height:1.5">
             <span style="font-weight:600">${r.icon} ${r.label}</span>
             <span style="color:var(--muted);font-size:.72rem;display:block;margin-top:1px;font-family:monospace;word-break:break-all">${r.value.length > 60 ? r.value.slice(0,60)+'…' : r.value}</span>
@@ -192,6 +191,7 @@ const Dashboard = (() => {
     const postInstr     = document.getElementById('gen-post-instr-set').value;
     const resellerId    = document.getElementById('gen-reseller-id')?.value.trim() || null;
     const resellerName  = document.getElementById('gen-reseller-name')?.value.trim() || null;
+    const paymentMethod = document.getElementById('gen-payment-method')?.value || '';
     const errEl         = document.getElementById('gen-err');
     errEl.classList.remove('show');
 
@@ -199,6 +199,7 @@ const Dashboard = (() => {
     if (!productId)    { errEl.textContent = 'Please select a product.'; errEl.classList.add('show'); return; }
     if (!packageLabel) { errEl.textContent = 'Please select a package.'; errEl.classList.add('show'); return; }
     if (!price || parseFloat(price) <= 0) { errEl.textContent = 'Price must be greater than $0. Generating free links is not allowed.'; errEl.classList.add('show'); return; }
+    if (!paymentMethod) { errEl.textContent = 'Payment method is required. Please select how the customer paid.'; errEl.classList.add('show'); return; }
 
     const skipCustomer = document.getElementById('gen-skip-customer')?.checked || false;
 
@@ -208,7 +209,6 @@ const Dashboard = (() => {
       carryOver[cb.dataset.key] = decodeURIComponent(cb.dataset.value);
     });
 
-    const paymentMethod = document.getElementById('gen-payment-method')?.value || '';
     const paymentRef    = document.getElementById('gen-payment-ref')?.value.trim() || '';
     const payload = {
       adminKey: Store.adminKey, customerName, productId, packageLabel,
@@ -218,7 +218,7 @@ const Dashboard = (() => {
       autoActivate: skipCustomer,
       allowDuplicate: true,
       carryOver: Object.keys(carryOver).length ? carryOver : undefined,
-      paymentMethod: paymentMethod || undefined,
+      paymentMethod: paymentMethod,
       paymentRef: paymentRef || undefined,
     };
 
@@ -233,6 +233,11 @@ const Dashboard = (() => {
     // Hide repeated panel and reset
     const panel = document.getElementById('repeated-customer-panel');
     if (panel) panel.style.display = 'none';
+    
+    // Reset form
+    document.getElementById('gen-payment-method').value = '';
+    document.getElementById('gen-payment-ref').value = '';
+    
     reload();
   };
 

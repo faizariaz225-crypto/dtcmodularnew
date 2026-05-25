@@ -318,6 +318,7 @@ const Customers = (() => {
         <div style="display:flex;gap:.3rem">
           ${st === 'active' ? `<button class="btn btn-ghost-blue btn-sm" onclick="Customers.sendReminder('${esc(t.token)}','reminder')">📧 Reminder</button>` : ''}
           ${st === 'active' || st === 'pending' ? `<button class="btn btn-outline btn-sm" style="border-color:var(--blue);color:var(--blue)" onclick="EditSub.open('${esc(t.token)}')">✏ Edit</button>` : ''}
+          ${st !== 'refunded' && t.paymentMethod ? `<button class="btn btn-outline btn-sm" style="border-color:var(--error);color:var(--error)" onclick="Customers.refundSubscription('${esc(t.token)}','${esc(t.customerName||'')}','${pm}','${(t.price||0).toFixed(2)}')">↩ Refund</button>` : ''}
         </div>
       </div>
     </div>`;
@@ -402,5 +403,19 @@ const Customers = (() => {
     await Dashboard.reload();
   };
 
-  return { init, render, select, search, setSubTab, reload, setFilter, sendReminder, sendReminderByKey, deleteCustomer };
+  const refundSubscription = async (token, name, method, amount) => {
+    // Find the payment record for this token
+    const payments = Store.payments || [];
+    const payment = payments.find(p => p.token === token && p.status !== 'refunded');
+    
+    if (!payment) {
+      alert('No payment record found for this subscription. Payment may have been made outside the system.');
+      return;
+    }
+    
+    // Open refund modal
+    Payments.openRefund(payment.id, name, method, amount);
+  };
+
+  return { init, render, select, search, setSubTab, reload, setFilter, sendReminder, sendReminderByKey, deleteCustomer, refundSubscription };
 })();

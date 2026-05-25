@@ -18,6 +18,7 @@ const Store = (() => {
   let _instructions  = { sets: {} };
   let _dashFilter    = 'all';
   let _custFilter    = 'all';
+  let _payments      = [];
 
   return {
     // ── Admin key ────────────────────────────────────────────────────────────
@@ -62,11 +63,16 @@ const Store = (() => {
     get templates()    { return _templates; },
     setTemplates(t)    { _templates = t || []; },
 
+    // ── Payments ──────────────────────────────────────────────────────────────
+    get payments()     { return _payments; },
+    setPayments(p)     { _payments = p || []; },
+
     // ── Bulk load after login ─────────────────────────────────────────────────
-    load({ tokens, emailLog, revenue }) {
+    load({ tokens, emailLog, revenue, payments }) {
       this.setTokens(tokens);
       this.setEmailLog(emailLog);
       if (revenue) this.setRevenue(revenue);
+      if (payments) this.setPayments(payments);
     },
   };
 })();
