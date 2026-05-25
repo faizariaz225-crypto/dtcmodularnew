@@ -256,6 +256,13 @@
       <div class="state-icon si-error">⚠</div>
       <div class="state-title">Link Unavailable</div>
       <p class="state-sub" id="invalid-msg">This activation link is invalid or has expired.</p>
+      <div id="debug-info" style="display:none;margin-top:1rem;padding:1rem;background:#f8faff;border:1px solid var(--border);border-radius:8px;font-size:.75rem;color:var(--muted);text-align:left">
+        <strong style="color:var(--text);display:block;margin-bottom:.5rem">Debug Information:</strong>
+        <div id="debug-details"></div>
+      </div>
+      <button onclick="location.reload()" style="margin-top:1.5rem;padding:.7rem 1.5rem;background:var(--blue);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600">
+        ↻ Retry
+      </button>
     </div>
 
     <!-- Declined -->
@@ -654,8 +661,30 @@
   // ── Fetch & boot ─────────────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', async () => {
     if (!linkToken) { showInvalid('No activation link found.'); return; }
+    
     try {
-      const r = await fetch(`/api/validate-token?token=${linkToken}`);
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
+      const r = await fetch(`/api/validate-token?token=${linkToken}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
+      if (!r.ok) {
+        if (r.status === 404) {
+          showInvalid('This activation link is invalid. Please contact support.');
+          return;
+        }
+        if (r.status === 410) {
+          const errData = await r.json().catch(() => ({}));
+          showInvalid(errData.error || 'This link is no longer valid. Please contact support.');
+          return;
+        }
+        throw new Error(`HTTP ${r.status}`);
+      }
+      
       const d = await r.json();
 
       // Show notification if set
@@ -704,10 +733,33 @@
         checkReady();
         show('screen-form');
       }
-    } catch { showInvalid('Unable to verify your link. Please try again or contact support.'); }
+    } catch (err) { 
+      console.error('Validation error:', err);
+      if (err.name === 'AbortError') {
+        showInvalid('Request timed out. Please check your connection and try again.', 'Fetch timeout after 15 seconds');
+      } else {
+        showInvalid('Unable to verify your link. Please refresh the page or contact support.', err.message || err.toString());
+      }
+    }
   });
 
-  const showInvalid = (msg) => { document.getElementById('invalid-msg').textContent = msg; show('screen-invalid'); };
+  const showInvalid = (msg, debugInfo) => { 
+    document.getElementById('invalid-msg').textContent = msg; 
+    
+    // Show debug info if available
+    if (debugInfo) {
+      const debugEl = document.getElementById('debug-info');
+      const debugDetails = document.getElementById('debug-details');
+      debugDetails.innerHTML = `
+        <div style="margin-bottom:.3rem"><strong>Token:</strong> ${linkToken || 'Not found'}</div>
+        <div style="margin-bottom:.3rem"><strong>URL:</strong> ${window.location.href}</div>
+        <div style="margin-bottom:.3rem"><strong>Error:</strong> ${debugInfo}</div>
+      `;
+      debugEl.style.display = 'block';
+    }
+    
+    show('screen-invalid'); 
+  };
   const showDeclined = (reason) => {
     document.getElementById('decline-reason-msg').textContent = reason || 'Please contact support.';
     show('screen-declined');
