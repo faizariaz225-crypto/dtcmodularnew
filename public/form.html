@@ -51,7 +51,7 @@
     .card-sub{font-size:.83rem;color:var(--muted);line-height:1.65;margin-bottom:1.6rem}
     .card-sub strong{color:var(--text)}
 
-    .instructions{background:#f8faff;border:1px solid var(--blue-mid);border-radius:10px;padding:.95rem 1.1rem;margin-bottom:1.5rem;font-size:.8rem;color:var(--muted);line-height:1.8}
+    .instructions{background:#f8faff;border:1px solid var(--blue-mid);border-radius:10px;padding:.95rem 1.1rem;margin-bottom:1.5rem;font-size:.8rem;color:var(--muted);line-height:1.8;animation:fadeIn .4s ease}
     .instructions.gpt-instr{background:var(--gpt-bg);border-color:var(--gpt-border)}
     .instructions strong{color:var(--text);display:block;margin-bottom:.4rem;font-size:.82rem;font-weight:600}
     .instructions ol{padding-left:1.3rem}
@@ -62,20 +62,28 @@
     .instructions .example.gpt-ex span{color:var(--gpt)}
     .gpt-notice{margin-top:.7rem;padding:.55rem .8rem;background:var(--white);border:1px solid var(--gpt-border);border-radius:7px;font-size:.72rem;color:var(--muted)}
 
-    .form-group{margin-bottom:1.1rem}
-    label{display:block;font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:.4rem}
+    .form-group{margin-bottom:1.1rem;animation:slideInUp .3s ease backwards;animation-delay:calc(var(--delay, 0) * 0.05s)}
+    .form-group:nth-child(1){--delay:1}
+    .form-group:nth-child(2){--delay:2}
+    .form-group:nth-child(3){--delay:3}
+    .form-group:nth-child(4){--delay:4}
+    .form-group:nth-child(5){--delay:5}
+    label{display:block;font-size:.72rem;font-weight:600;color:var(--text);margin-bottom:.4rem;letter-spacing:.01em}
     .input-wrap{position:relative}
-    .input-wrap input,.input-wrap textarea{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:9px;padding:.78rem 1rem .78rem 2.7rem;font-family:'Inter',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
+    .input-wrap input,.input-wrap textarea{width:100%;background:var(--white);border:1.5px solid var(--border);border-radius:9px;padding:.78rem 1rem .78rem 2.7rem;font-family:'Inter',sans-serif;font-size:.88rem;color:var(--text);outline:none;transition:all .2s ease}
     .input-wrap textarea{padding:.78rem 1rem;min-height:110px;resize:vertical;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.5}
     .input-wrap input::placeholder,.input-wrap textarea::placeholder{color:var(--muted2)}
-    .input-wrap input:focus,.input-wrap textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-    .input-wrap input.ok,.input-wrap textarea.ok{border-color:var(--success)}
-    .input-wrap input.err,.input-wrap textarea.err{border-color:var(--error);box-shadow:0 0 0 3px rgba(220,38,38,.08)}
-    .input-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.85rem;pointer-events:none}
+    .input-wrap input:focus,.input-wrap textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12);transform:translateY(-1px)}
+    .input-wrap input.ok,.input-wrap textarea.ok{border-color:var(--success);background:linear-gradient(to right,#f0fdf4 0%,#fff 20%)}
+    .input-wrap input.err,.input-wrap textarea.err{border-color:var(--error);box-shadow:0 0 0 3px rgba(220,38,38,.08);animation:shake .3s ease}
+    .input-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:.85rem;pointer-events:none;transition:color .2s}
+    .input-wrap input:focus + .input-icon,.input-wrap textarea:focus + .input-icon{color:var(--blue)}
     .input-icon.top{top:.9rem;transform:none}
     .field-hint{font-size:.7rem;color:var(--muted2);margin-top:.35rem}
     .field-error{font-size:.73rem;color:var(--error);margin-top:.35rem;display:none}
     .field-error.show{display:block;animation:slideIn .18s ease}
+    .field-change-btn{background:none;border:1px solid var(--blue-mid);color:var(--blue);border-radius:6px;padding:.15rem .5rem;font-size:.68rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+    .field-change-btn:hover{background:var(--blue-light);border-color:var(--blue);transform:translateY(-1px)}
     .divider{height:1px;background:var(--border);margin:1.4rem 0}
 
     .btn-submit{width:100%;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:.9rem;font-family:'Inter',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;letter-spacing:.01em;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
@@ -215,6 +223,9 @@
     @keyframes drawK{to{stroke-dashoffset:0}}
     @keyframes barPulse{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
     @keyframes cfloat{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(-140px) rotate(720deg)}}
+    @keyframes slideInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-4px)}20%,40%,60%,80%{transform:translateX(4px)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   </style>
 </head>
 <body id="page-body">
@@ -330,20 +341,28 @@
       </div>
 
       <div class="form-group">
-        <label>WeChat ID</label>
+        <label style="display:flex;align-items:center;justify-content:space-between">
+          <span>WeChat ID</span>
+          <button type="button" id="wechat-change-btn" class="field-change-btn" onclick="unlockField('wechat')" style="display:none">Change</button>
+        </label>
         <div class="input-wrap">
           <span class="input-icon">💬</span>
           <input type="text" id="wechat" placeholder="Your WeChat ID" oninput="validateWechat()"/>
         </div>
+        <div class="field-hint" id="wechat-locked-hint" style="display:none;color:var(--blue)">✓ Using saved WeChat ID. Click "Change" to update.</div>
         <div class="field-error" id="err-wechat"></div>
       </div>
 
       <div class="form-group">
-        <label>Email Address</label>
+        <label style="display:flex;align-items:center;justify-content:space-between">
+          <span>Email Address</span>
+          <button type="button" id="email-change-btn" class="field-change-btn" onclick="unlockField('email')" style="display:none">Change</button>
+        </label>
         <div class="input-wrap">
           <span class="input-icon">✉</span>
           <input type="email" id="email" placeholder="you@example.com" oninput="validateEmail()"/>
         </div>
+        <div class="field-hint" id="email-locked-hint" style="display:none;color:var(--blue)">✓ Using saved email. Click "Change" to update.</div>
         <div class="field-error" id="err-email"></div>
       </div>
 
@@ -358,22 +377,69 @@
     <div id="screen-processing" class="screen">
       <div class="orbit" id="proc-orbit">
         <div class="orbit-ring r1"></div><div class="orbit-ring r2"></div>
-        <div class="orbit-center">⚡</div>
+        <div class="orbit-center" id="proc-icon">⚡</div>
       </div>
-      <div class="state-title">Setting Up Your Account</div>
-      <p class="state-sub" id="proc-msg">Your details have been received and are being reviewed.</p>
+      <div class="state-title" id="proc-title">Processing Your Order</div>
+      <p class="state-sub" id="proc-msg">Your details have been received and are being processed.</p>
+      
+      <!-- Progress indicator -->
       <div class="pulse-bars" id="pulse-bars">
         <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
       </div>
+      
+      <!-- Order summary card -->
       <div class="order-card">
         <div class="oc-row"><span class="oc-label">Package</span><span class="oc-value" id="proc-pkg">—</span></div>
         <div class="oc-row"><span class="oc-label">Data</span><span class="oc-value" id="proc-data">—</span></div>
-        <div class="oc-row"><span class="oc-label">Status</span><span class="pill pill-proc"><span class="pd"></span>Under Review</span></div>
+        <div class="oc-row"><span class="oc-label">Status</span><span class="pill pill-proc" id="proc-status-pill"><span class="pd"></span>Processing</span></div>
       </div>
+      
+      <!-- Two-stage timeline -->
       <div class="timeline">
-        <div class="tl-item"><div class="tl-dot done">✓</div><div class="tl-body"><div class="tl-title">Details Submitted</div><div class="tl-sub">Your information has been received.</div></div></div>
-        <div class="tl-item"><div class="tl-dot spin" id="tl2-dot">◎</div><div class="tl-body"><div class="tl-title" id="tl2-title">Under Review</div><div class="tl-sub" id="tl2-sub">Our system is verifying your account.</div></div></div>
-        <div class="tl-item"><div class="tl-dot wait" id="tl3-dot">○</div><div class="tl-body"><div class="tl-title dim" id="tl3-title">Activation Pending</div><div class="tl-sub" id="tl3-sub">Your package will be activated after verification.</div></div></div>
+        <div class="tl-item" id="tl-stage1">
+          <div class="tl-dot done">✓</div>
+          <div class="tl-body">
+            <div class="tl-title">Details Submitted</div>
+            <div class="tl-sub">Your information has been received successfully.</div>
+          </div>
+        </div>
+        
+        <div class="tl-item" id="tl-stage2">
+          <div class="tl-dot spin" id="tl2-dot">◎</div>
+          <div class="tl-body">
+            <div class="tl-title" id="tl2-title">Processing</div>
+            <div class="tl-sub" id="tl2-sub">Validating your details and preparing your account...</div>
+          </div>
+        </div>
+        
+        <div class="tl-item" id="tl-stage3">
+          <div class="tl-dot wait" id="tl3-dot">○</div>
+          <div class="tl-body">
+            <div class="tl-title dim" id="tl3-title">Verified - Order in Queue</div>
+            <div class="tl-sub" id="tl3-sub">Your order will be activated shortly.</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Time-based warning message (shows after 30 minutes) -->
+      <div id="server-load-warning" style="display:none;margin-top:1.5rem;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:1rem 1.2rem">
+        <div style="display:flex;align-items:flex-start;gap:.8rem">
+          <div style="font-size:1.5rem;flex-shrink:0">⚠️</div>
+          <div>
+            <div style="font-size:.85rem;font-weight:700;color:#b45309;margin-bottom:.4rem">Server Under Heavy Load</div>
+            <div style="font-size:.8rem;color:#92400e;line-height:1.6">
+              Your order is taking longer than usual due to high server load. You can safely close this page now — we'll send you an email notification once your package is activated.
+            </div>
+            <div style="font-size:.75rem;color:#78350f;margin-top:.6rem;font-weight:500">
+              Expected completion: Within the next 2-4 hours
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Elapsed time display -->
+      <div id="elapsed-time-display" style="display:none;margin-top:1rem;font-size:.75rem;color:var(--muted);text-align:center">
+        Processing time: <span id="elapsed-time" style="font-family:'JetBrains Mono',monospace;font-weight:600">0:00</span>
       </div>
     </div>
 
@@ -611,6 +677,17 @@
       } else {
         document.getElementById('cust-name').textContent = d.customerName;
         document.getElementById('pkg-label').textContent = d.packageType;
+        
+        // Pre-fill and lock email/wechat if they were carried over from previous subscription
+        if (d.wechat) {
+          document.getElementById('wechat').value = d.wechat;
+          lockField('wechat');
+        }
+        if (d.email) {
+          document.getElementById('email').value = d.email;
+          lockField('email');
+        }
+        
         show('screen-form');
       }
     } catch (err) { 
@@ -678,6 +755,38 @@
     document.getElementById('submit-btn').disabled = true;
   };
 
+  // ── Lock/Unlock Fields (for pre-filled email/wechat) ────────────────────
+  const lockField = (fieldId) => {
+    const input = document.getElementById(fieldId);
+    const changeBtn = document.getElementById(fieldId + '-change-btn');
+    const hint = document.getElementById(fieldId + '-locked-hint');
+    
+    if (!input || !changeBtn || !hint) return;
+    
+    input.disabled = true;
+    input.style.background = '#f8fafc';
+    input.style.borderColor = 'var(--blue-mid)';
+    input.style.color = 'var(--blue)';
+    changeBtn.style.display = 'inline-block';
+    hint.style.display = 'block';
+  };
+
+  const unlockField = (fieldId) => {
+    const input = document.getElementById(fieldId);
+    const changeBtn = document.getElementById(fieldId + '-change-btn');
+    const hint = document.getElementById(fieldId + '-locked-hint');
+    
+    if (!input || !changeBtn || !hint) return;
+    
+    input.disabled = false;
+    input.style.background = '';
+    input.style.borderColor = '';
+    input.style.color = '';
+    input.focus();
+    changeBtn.style.display = 'none';
+    hint.style.display = 'none';
+  };
+
   const checkReady = () => {
     const isGpt  = currentProduct === 'chatgpt';
     const isCreds= state.credentialsMode;
@@ -730,14 +839,92 @@
     }
   };
 
+  let processingStartTime = null;
+  let elapsedTimer = null;
+  
   const showProcessing = () => {
     const isGpt = currentProduct === 'chatgpt';
     document.getElementById('proc-pkg').textContent  = state.packageType;
     document.getElementById('proc-data').textContent = isGpt
       ? (state.sessionData ? 'Session data received' : '—')
       : (state.orgId ? state.orgId.slice(0,18)+'…' : '—');
-    if (state.processingText) document.querySelector('#screen-processing .state-sub').textContent = state.processingText;
+    if (state.processingText) document.getElementById('proc-msg').textContent = state.processingText;
+    
+    // Start timing
+    processingStartTime = Date.now();
+    document.getElementById('elapsed-time-display').style.display = 'block';
+    startElapsedTimer();
+    
+    // Stage 1: Processing (default state)
+    updateProcessingStage('processing');
+    
+    // Auto-transition to Stage 2 (Verified - Queue) after 2 minutes
+    setTimeout(() => {
+      if (document.getElementById('screen-processing').classList.contains('active')) {
+        updateProcessingStage('verified');
+      }
+    }, 2 * 60 * 1000); // 2 minutes
+    
+    // Show server load warning after 30 minutes
+    setTimeout(() => {
+      if (document.getElementById('screen-processing').classList.contains('active')) {
+        document.getElementById('server-load-warning').style.display = 'block';
+      }
+    }, 30 * 60 * 1000); // 30 minutes
+    
     show('screen-processing');
+  };
+  
+  const updateProcessingStage = (stage) => {
+    if (stage === 'processing') {
+      // Stage 1: Processing
+      document.getElementById('tl2-dot').className = 'tl-dot spin';
+      document.getElementById('tl2-dot').textContent = '◎';
+      document.getElementById('tl2-title').textContent = 'Processing';
+      document.getElementById('tl2-sub').textContent = 'Validating your details and preparing your account...';
+      document.getElementById('proc-status-pill').innerHTML = '<span class="pd"></span>Processing';
+      document.getElementById('proc-title').textContent = 'Processing Your Order';
+      
+      document.getElementById('tl3-dot').className = 'tl-dot wait';
+      document.getElementById('tl3-title').classList.add('dim');
+    } else if (stage === 'verified') {
+      // Stage 2: Verified - In Queue
+      document.getElementById('tl2-dot').className = 'tl-dot done';
+      document.getElementById('tl2-dot').textContent = '✓';
+      document.getElementById('tl2-title').textContent = 'Verified';
+      document.getElementById('tl2-sub').textContent = 'Your details have been verified successfully.';
+      
+      document.getElementById('tl3-dot').className = 'tl-dot spin';
+      document.getElementById('tl3-dot').textContent = '◎';
+      document.getElementById('tl3-title').textContent = 'Order in Queue';
+      document.getElementById('tl3-title').classList.remove('dim');
+      document.getElementById('tl3-sub').textContent = 'Your activation is queued and will be processed shortly.';
+      document.getElementById('proc-status-pill').innerHTML = '<span class="pd"></span>In Queue';
+      document.getElementById('proc-title').textContent = 'Verified - Awaiting Activation';
+      document.getElementById('proc-msg').textContent = 'Your order has been verified and is waiting in the activation queue.';
+    }
+  };
+  
+  const startElapsedTimer = () => {
+    if (elapsedTimer) clearInterval(elapsedTimer);
+    
+    const updateElapsed = () => {
+      if (!processingStartTime) return;
+      const elapsed = Math.floor((Date.now() - processingStartTime) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      document.getElementById('elapsed-time').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+    
+    updateElapsed();
+    elapsedTimer = setInterval(updateElapsed, 1000);
+  };
+  
+  const stopElapsedTimer = () => {
+    if (elapsedTimer) {
+      clearInterval(elapsedTimer);
+      elapsedTimer = null;
+    }
   };
 
   const startPolling = () => {
@@ -746,9 +933,10 @@
         const r = await fetch(`/api/status?token=${linkToken}`);
         const d = await r.json();
         if (d.notification && d.notification.message) showNotification(d.notification);
-        if (d.processingText) document.querySelector('#screen-processing .state-sub').textContent = d.processingText;
+        if (d.processingText) document.getElementById('proc-msg').textContent = d.processingText;
         if (d.status === 'activated') {
           clearInterval(pollTimer);
+          stopElapsedTimer();
           Object.assign(state, {
             orgId: d.orgId||state.orgId, sessionData: d.sessionData||state.sessionData,
             wechat: d.wechat||state.wechat, email: d.email||state.email,
@@ -764,7 +952,9 @@
           });
           showActivated(d.approvedAt, d.subscriptionExpiresAt);
         } else if (d.status === 'declined') {
-          clearInterval(pollTimer); showDeclined(d.declineReason);
+          clearInterval(pollTimer);
+          stopElapsedTimer();
+          showDeclined(d.declineReason);
         }
       } catch (err) {
         console.error('Polling error:', err);

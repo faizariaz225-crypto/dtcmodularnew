@@ -78,6 +78,70 @@
     .exp-flag.danger,
     .exp-flag.expired { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error); }
 
+    /* Checkbox styling for carry-over fields */
+    input[type="checkbox"][name="carry-over"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      background: var(--white);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    input[type="checkbox"][name="carry-over"]:hover {
+      border-color: var(--blue);
+    }
+    input[type="checkbox"][name="carry-over"]:checked {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    input[type="checkbox"][name="carry-over"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    
+    /* Skip customer checkbox styling */
+    #gen-skip-customer {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      background: var(--white);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    #gen-skip-customer:hover {
+      border-color: var(--blue);
+    }
+    #gen-skip-customer:checked {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    #gen-skip-customer:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
     /* Action buttons inside table */
     .action-wrap  { display: flex; flex-direction: column; gap: .4rem; }
     .approve-btn  { background: var(--success-bg); border: 1.5px solid var(--success-border); border-radius: 7px; padding: .3rem .75rem; font-family: 'Inter',sans-serif; font-size: .73rem; font-weight: 700; color: var(--success); cursor: pointer; transition: all .18s; white-space: nowrap; }
@@ -452,7 +516,7 @@
 
         <div class="form-row" style="margin-top:.7rem">
           <div class="form-group" style="margin-bottom:0">
-            <label>Payment Method</label>
+            <label>Payment Method <span style="color:var(--error);font-size:.65rem;font-weight:400">* required for tracking</span></label>
             <select id="gen-payment-method">
               <option value="">— Select method —</option>
               <option value="alipay">Alipay</option>
@@ -504,7 +568,7 @@
 
         <!-- Skip customer details -->
         <div style="margin-top:.8rem;padding:.65rem .8rem;background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:.6rem">
-          <input type="checkbox" id="gen-skip-customer" style="width:16px;height:16px;cursor:pointer" onchange="Dashboard.onSkipCustomerChange()"/>
+          <input type="checkbox" id="gen-skip-customer" onchange="Dashboard.onSkipCustomerChange()"/>
           <label for="gen-skip-customer" style="font-size:.82rem;cursor:pointer;color:var(--fg)">
             <strong>Skip customer details</strong> — activate directly without customer filling the form
           </label>
